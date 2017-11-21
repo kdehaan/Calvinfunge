@@ -38,21 +38,33 @@ class Field:
         return self.matrix[self.pointer_i][self.pointer_j]
         # print()
 
+    def move(self):
+        self.pointer_i = (self.pointer_i + self.momentum_i) % self.max_i
+        self.pointer_j = (self.pointer_j + self.momentum_j) % self.max_j
+
     def displace_pointer(self, i, j):
         self.pointer_i = (self.pointer_i + i) % self.max_i
         self.pointer_j = (self.pointer_j + j) % self.max_j
+
+    def advance_pointer(self, v):
+        self.displace_pointer(v*self.momentum_i, v*self.momentum_j)
 
     def set_pointer(self, i, j):
         self.pointer_i = i % self.max_i
         self.pointer_j = j % self.max_j
 
-    def set_momentum(self, i, j):
+    def set_i_momentum(self, i):
         self.momentum_i = i
+
+    def set_j_momentum(self, j):
         self.momentum_j = j
 
     def reflect_momentum(self):
         self.momentum_i = -self.momentum_i
         self.momentum_j = -self.momentum_j
+
+    def set_matrix(self, i, j, v):
+        self.matrix[i][j] = v
 
     def sigmoid(self, value):
         if value > 1:

@@ -40,10 +40,10 @@ class Translator:
             23: self.left,
             24: self.up,
             25: self.down,
-            26: self.right_momemtum,
-            27: self.left_momemtum,
-            28: self.up_momemtum,
-            29: self.down_momemtum,
+            26: self.right_momentum,
+            27: self.left_momentum,
+            28: self.up_momentum,
+            29: self.down_momentum,
             30: self.cond_right,
             31: self.cond_down,
             32: self.string_toggle,
@@ -136,8 +136,8 @@ class Translator:
         self.stack.append(b % a)
 
     def logical_not(self):
-        a = self.stack.pop()
-        if a == 0:
+        v = self.stack.pop()
+        if v == 0:
             self.stack.append(1)
         else:
             self.stack.append(0)
@@ -148,24 +148,46 @@ class Translator:
         self.stack.append(b > a) #might not work
 
     def right(self):
+        self.field.set_j_momentum(1)
+        self.field.set_i_momentum(0)
 
     def left(self):
+        self.field.set_j_momentum(-1)
+        self.field.set_i_momentum(0)
 
     def up(self):
+        self.field.set_j_momentum(0)
+        self.field.set_i_momentum(-1)
 
     def down(self):
+        self.field.set_j_momentum(0)
+        self.field.set_i_momentum(1)
 
     def right_momentum(self):
+        self.field.set_j_momentum(1)
 
     def left_momentum(self):
+        self.field.set_j_momentum(-1)
 
     def up_momentum(self):
+        self.field.set_i_momentum(-1)
 
     def down_momentum(self):
+        self.field.set_i_momentum(1)
 
     def cond_right(self):
+        v = self.stack.pop()
+        if v == 0:
+            self.left()
+        else:
+            self.right()
 
     def cond_down(self):
+        v = self.stack.pop()
+        if v == 0:
+            self.up()
+        else:
+            self.down()
 
     def string_toggle(self):
         self.string_mode = (self.string_mode + 1) % 2
@@ -180,24 +202,31 @@ class Translator:
         self.stack.append(b)
 
     def pop_ascii(self):
-        a = self.stack.pop()
-        print(a)
+        v = self.stack.pop()
+        print(v)
 
     def bridge(self):
+        self.field.advance_pointer(1)
 
     def bridge_num(self):
+        v = self.stack.pop()
+        self.field.advance_pointer(v)
+
 
     def put(self):
+        v = self.stack.pop()
+        j = self.stack.pop()
+        i = self.stack.pop()
+        self.field.set_matrix(i, j, v)
 
     def get(self):
 
     def ask_num(self):
-        self.stack.push(input("Number: "))
+        self.stack.append(input("Number: "))
 
     def ask_ascii(self):
-        self.stack.push(input("Ascii: "))
+        self.stack.append(input("Ascii: "))
 
     def end(self):
-
-
-
+        return
+        
