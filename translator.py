@@ -63,6 +63,8 @@ class Translator:
 
 
     def do(self, arg):
+        if arg == ' ':
+            self.skip()
         if not self.string_mode:
             self.current_arg = (self.current_arg + arg) % self.num_commands
             self.commands[self.current_arg]()
@@ -212,7 +214,6 @@ class Translator:
         v = self.stack.pop()
         self.field.advance_pointer(v)
 
-
     def put(self):
         v = self.stack.pop()
         j = self.stack.pop()
@@ -220,6 +221,10 @@ class Translator:
         self.field.set_matrix(i, j, v)
 
     def get(self):
+        j = self.stack.pop()
+        i = self.stack.pop()
+        v = self.field.get_matrix(i, j)
+        self.stack.append(v)
 
     def ask_num(self):
         self.stack.append(input("Number: "))
@@ -229,4 +234,3 @@ class Translator:
 
     def end(self):
         return
-        

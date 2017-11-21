@@ -36,7 +36,6 @@ class Field:
 
     def pointer_value(self):
         return self.matrix[self.pointer_i][self.pointer_j]
-        # print()
 
     def move(self):
         self.pointer_i = (self.pointer_i + self.momentum_i) % self.max_i
@@ -65,6 +64,9 @@ class Field:
 
     def set_matrix(self, i, j, v):
         self.matrix[i][j] = v
+
+    def get_matrix(self, i, j):
+        return self.matrix[i][j]
 
     def sigmoid(self, value):
         if value > 1:
