@@ -60,7 +60,11 @@ class Translator:
         }
         self.num_commands = len(self.commands)
 
+    def get_pointer_value(self):
+        return self.field.pointer_value()
 
+    def move_pointer(self):
+        self.field.advance_pointer(1)
 
     def do(self, arg):
         if arg == ' ':
@@ -75,25 +79,33 @@ class Translator:
 
     def push0(self):
         self.stack.append(0)
+
     def push1(self):
         self.stack.append(1)
+
     def push2(self):
         self.stack.append(2)
+
     def push3(self):
         self.stack.append(3)
+
     def push4(self):
         self.stack.append(4)
+
     def push5(self):
         self.stack.append(5)
+
     def push6(self):
         self.stack.append(6)
+
     def push7(self):
         self.stack.append(7)
+
     def push8(self):
         self.stack.append(8)
+
     def push9(self):
         self.stack.append(9)
-
 
     def discard(self):
         self.stack.pop()
