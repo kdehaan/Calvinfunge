@@ -8,9 +8,11 @@ class Translator:
     current_val = ''
     current_arg = 0
     string_mode = 0
-    location = field.Field()
 
-    def __init__(self):
+    def __init__(self, filename):
+
+        self.field = field.Field(filename)
+
         self.commands = {
             0: self.push0,
             1: self.push1,
@@ -26,7 +28,7 @@ class Translator:
             11: self.reflect,
             12: self.discard,
             13: self.reverse,
-            14: self.skip,
+            14: self.teleport,
             15: self.add,
             16: self.subtract,
             17: self.multiply,
@@ -56,15 +58,16 @@ class Translator:
             41: self.ask_ascii,
             42: self.end
         }
+        self.num_commands = len(self.commands)
 
 
 
     def do(self, arg):
         if not self.string_mode:
-            self.current_arg = (self.current_arg + arg) % len(self.commands)
+            self.current_arg = (self.current_arg + arg) % self.num_commands
             self.commands[self.current_arg]()
             if arg == 0:
-                self.current_arg = (self.current_arg + 9) % 28
+                self.current_arg = (self.current_arg + 1) % self.num_commands
         else:
             print(arg)
 
@@ -96,9 +99,16 @@ class Translator:
     def reverse(self):
         self.stack.reverse()
 
+    def teleport(self):
+        j = self.stack.pop()
+        i = self.stack.pop()
+        self.field.set_pointer(i, j)
+
     def skip(self):
+        return
 
     def reflect(self):
+        self.field.reflect_momentum()
 
     def add(self):
         a = self.stack.pop()
