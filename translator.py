@@ -12,7 +12,53 @@ class Translator:
     def __init__(self, filename):
 
         self.field = field.Field(filename)
-
+        self.current_val = self.field.pointer_value()
+        self.inputs = {
+            "0": 0,
+            "1": 1,
+            "2": 2,
+            "3": 3,
+            "4": 4,
+            "5": 5,
+            "6": 6,
+            "7": 7,
+            "8": 8,
+            "9": 9,
+            "a": 10,
+            "b": 11,
+            "c": 12,
+            "d": 13,
+            "e": 14,
+            "f": 15,
+            "!": 16,
+            "@": 17,
+            "#": 18,
+            "$": 19,
+            "%": 20,
+            "^": 21,
+            "&": 22,
+            "*": 23,
+            "(": 24,
+            ")": 25,
+            "-": 26,
+            "=": 27,
+            "_": 28,
+            "+": 29,
+            "[": 30,
+            "]": 31,
+            "{": 32,
+            "}": 33,
+            ";": 34,
+            ":": 35,
+            ",": 36,
+            ".": 37,
+            "/": 38,
+            "<": 39,
+            ">": 40,
+            "?": 41,
+            "~": 42,
+            "n": 43,
+        }
         self.commands = {
             0: self.push0,
             1: self.push1,
@@ -56,7 +102,8 @@ class Translator:
             39: self.get,
             40: self.ask_num,
             41: self.ask_ascii,
-            42: self.end
+            42: self.increase_argval,
+            43: self.end
         }
         self.num_commands = len(self.commands)
 
@@ -65,17 +112,37 @@ class Translator:
 
     def move_pointer(self):
         self.field.advance_pointer(1)
+        self.current_val = self.field.pointer_value()
 
     def do(self, arg):
-        if arg == ' ':
-            self.skip()
+
+        if self.inputs[arg] == 32:
+            self.string_toggle()
+            return True
+
         if not self.string_mode:
+            if arg == ' ':
+                self.skip()
+            arg = self.inputs[arg]
             self.current_arg = (self.current_arg + arg) % self.num_commands
+
+            print("input argument: ")
+            print(arg)
+            print("output equivalent: ")
+            print(self.current_arg)
+
             self.commands[self.current_arg]()
             if arg == 0:
-                self.current_arg = (self.current_arg + 1) % self.num_commands
-        else:
+                self.current_arg = (self.current_arg + -1) % self.num_commands
+
+        if self.string_mode:
+            print("printing directly: ")
             print(arg)
+
+        if self.current_arg == (self.num_commands + 1):
+            return False
+
+        return True
 
     def push0(self):
         self.stack.append(0)
@@ -116,7 +183,7 @@ class Translator:
     def teleport(self):
         j = self.stack.pop()
         i = self.stack.pop()
-        self.field.set_pointer(i, j)
+        self.field.set_pointer(i-self.field.momentum_i, j-self.field.momentum_i)
 
     def skip(self):
         return
@@ -244,5 +311,13 @@ class Translator:
     def ask_ascii(self):
         self.stack.append(input("Ascii: "))
 
+    def increase_argval(self):
+        v = self.stack.pop()
+        self.current_arg = (self.current_arg + v) % self.num_commands
+
     def end(self):
+        print("Ending")
         return
+
+    def is_stringmode(self):
+        return self.string_mode

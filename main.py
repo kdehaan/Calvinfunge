@@ -1,19 +1,12 @@
-import field
-#import interpreter
-import translator
-
-
+import executor
 
 
 def main():
     filename = input("Code location: ")
     if not filename:
         filename = "testfunge.cf"
-    t = translator.Translator(filename)
 
-    # new_field = field.Field(filename)
-    # new_field.print_matrix()
-    # new_field.pointer_value()
+    executor.Executor(filename)
 
 
 if __name__ == '__main__':
