@@ -7,58 +7,12 @@ class Translator:
     commands = dict()
     current_val = ''
     current_arg = 0
-    string_mode = 0
 
     def __init__(self, filename):
 
         self.field = field.Field(filename)
         self.current_val = self.field.pointer_value()
-        self.inputs = {
-            "0": 0,
-            "1": 1,
-            "2": 2,
-            "3": 3,
-            "4": 4,
-            "5": 5,
-            "6": 6,
-            "7": 7,
-            "8": 8,
-            "9": 9,
-            "a": 10,
-            "b": 11,
-            "c": 12,
-            "d": 13,
-            "e": 14,
-            "f": 15,
-            "!": 16,
-            "@": 17,
-            "#": 18,
-            "$": 19,
-            "%": 20,
-            "^": 21,
-            "&": 22,
-            "*": 23,
-            "(": 24,
-            ")": 25,
-            "-": 26,
-            "=": 27,
-            "_": 28,
-            "+": 29,
-            "[": 30,
-            "]": 31,
-            "{": 32,
-            "}": 33,
-            ";": 34,
-            ":": 35,
-            ",": 36,
-            ".": 37,
-            "/": 38,
-            "<": 39,
-            ">": 40,
-            "?": 41,
-            "~": 42,
-            "n": 43,
-        }
+
         self.commands = {
             0: self.push0,
             1: self.push1,
@@ -92,18 +46,20 @@ class Translator:
             29: self.down_momentum,
             30: self.cond_right,
             31: self.cond_down,
-            32: self.string_toggle,
+            32: self.print_value,
             33: self.duplicate,
             34: self.swap,
-            35: self.pop_ascii,
+            35: self.print_ascii,
             36: self.bridge,
             37: self.bridge_num,
             38: self.put,
             39: self.get,
             40: self.ask_num,
             41: self.ask_ascii,
-            42: self.increase_argval,
-            43: self.end
+            42: self.push_a,
+            43: self.push_A,
+            44: self.shift_arg,
+            45: self.end
         }
         self.num_commands = len(self.commands)
 
@@ -116,29 +72,16 @@ class Translator:
 
     def do(self, arg):
 
-        if self.inputs[arg] == 32:
-            self.string_toggle()
+        if arg == ' ':
+            self.skip()
             return True
 
-        if not self.string_mode:
-            if arg == ' ':
-                self.skip()
-            arg = self.inputs[arg]
-            self.current_arg = (self.current_arg + arg) % self.num_commands
+        self.current_arg = (self.current_arg + arg) % self.num_commands
 
-            print("input argument: ")
-            print(arg)
-            print("output equivalent: ")
-            print(self.current_arg)
+        print("running: ")
+        print(self.current_arg)
 
-            self.commands[self.current_arg]()
-            if arg == 0:
-                self.current_arg = (self.current_arg + -1) % self.num_commands
-
-        if self.string_mode:
-            print("printing directly: ")
-            print(arg)
-
+        self.commands[self.current_arg]()
         if self.current_arg == (self.num_commands + 1):
             return False
 
@@ -270,8 +213,11 @@ class Translator:
         else:
             self.down()
 
-    def string_toggle(self):
-        self.string_mode = (self.string_mode + 1) % 2
+    def push_a(self):
+        self.stack.append(97)
+
+    def push_A(self):
+        self.stack.append(65)
 
     def duplicate(self):
         self.stack.append(self.stack[-1])
@@ -282,9 +228,13 @@ class Translator:
         self.stack.append(a)
         self.stack.append(b)
 
-    def pop_ascii(self):
+    def print_value(self):
         v = self.stack.pop()
-        print(v)
+        print(v, end='')
+
+    def print_ascii(self):
+        v = self.stack.pop()
+        print(chr(v), end='')
 
     def bridge(self):
         self.field.advance_pointer(1)
@@ -311,13 +261,10 @@ class Translator:
     def ask_ascii(self):
         self.stack.append(input("Ascii: "))
 
-    def increase_argval(self):
+    def shift_arg(self):
         v = self.stack.pop()
         self.current_arg = (self.current_arg + v) % self.num_commands
 
     def end(self):
         print("Ending")
         return
-
-    def is_stringmode(self):
-        return self.string_mode

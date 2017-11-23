@@ -2,7 +2,7 @@ import executor
 
 
 def main():
-    filename = input("Code location: ")
+    filename = "testfunge.cf"  # input("Code location: ")
     if not filename:
         filename = "testfunge.cf"
 
